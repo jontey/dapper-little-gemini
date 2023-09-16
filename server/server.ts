@@ -1,18 +1,30 @@
-const express = require("express");
-const path = require("path");
+import express from "express";
+import path from "path";
+import moviesJson from "./movies_metadata.json"
 
 const app = express();
 
 // A test route to make sure the server is up.
 app.get("/api/ping", (request, response) => {
   console.log("❇️ Received GET request to /api/ping");
-  response.send("pong!");
+  return response.send("pong!");
 });
 
 // A mock route to return some data.
 app.get("/api/movies", (request, response) => {
   console.log("❇️ Received GET request to /api/movies");
-  response.json({ data: [{ id: 1, name: '1' }, { id: 2, name: '2' }] });
+  return response.json({ data: moviesJson });
+});
+
+app.get("/api/movies/:id", (request, response) => {
+  console.log("❇️ Received GET request to /api/movies/:id");
+  if (request.params.id) {
+    const movie = moviesJson.find(movie => {
+      return movie.id.toString() == request.params.id
+    })
+    return response.json({ data: movie });
+  }
+  return response.json({ data: {} })
 });
 
 // Express port-switching logic
@@ -34,5 +46,5 @@ if (process.env.NODE_ENV === "production") {
 
 // Start the listener!
 const listener = app.listen(port, () => {
-  console.log("❇️ Express server is running on port", listener.address().port);
+  console.log("❇️ Express server is running on port", port);
 });
